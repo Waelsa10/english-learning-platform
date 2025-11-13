@@ -79,8 +79,11 @@ export interface Subscription {
   startDate: Timestamp;
   endDate: Timestamp;
   status: SubscriptionStatus;
-  stripeSubscriptionId?: string;
-  stripeCustomerId?: string;
+  paddleCustomerId?: string;        // UPDATED
+  paddleSubscriptionId?: string;    // UPDATED
+  paddleTransactionId?: string;     // UPDATED
+  currentPeriodStart?: Timestamp;
+  currentPeriodEnd?: Timestamp;
   cancelAtPeriodEnd?: boolean;
 }
 
@@ -317,13 +320,13 @@ export interface TeacherApplication {
 export interface PaymentHistory {
   id: string;
   userId: string;
-  stripePaymentIntentId: string;
+  paddleTransactionId: string;      // UPDATED
   amount: number;
   currency: string;
   status: 'succeeded' | 'failed' | 'refunded';
   description: string;
   createdAt: Timestamp;
-  invoiceUrl?: string;
+  receiptUrl?: string;
 }
 
 export interface PlatformAnalytics {
@@ -337,4 +340,33 @@ export interface PlatformAnalytics {
   newRegistrationsThisWeek: number;
   newRegistrationsThisMonth: number;
   averageEngagementRate: number;
+}
+// ADD THESE AT THE END OF THE FILE
+
+export interface PromoCode {
+  id: string;
+  code: string;
+  discountPercentage: number;
+  description?: string;
+  validFrom: Timestamp;
+  validUntil: Timestamp;
+  usageLimit: number | null;
+  usageCount: number;
+  isActive: boolean;
+  applicablePlans: SubscriptionPlan[];
+  createdBy: string;
+  createdByName: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface PromoCodeUsage {
+  id: string;
+  promoCodeId: string;
+  promoCode: string;
+  userId: string;
+  userName: string;
+  discountPercentage: number;
+  appliedAt: Timestamp;
+  subscriptionId?: string;
 }

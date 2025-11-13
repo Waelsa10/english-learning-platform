@@ -19,7 +19,7 @@ import { AdminDashboard } from '@/features/dashboard/AdminDashboard';
 import { AssignmentList } from '@/features/assignments/AssignmentList';
 import { AssignmentCreate } from '@/features/assignments/AssignmentCreate';
 import { MessagesList } from '@/features/messages/MessagesList';
-
+import { PaymentSuccessPage } from '@/pages/PaymentSuccessPage';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -103,6 +103,7 @@ function AppContent() {
 
       {/* 404 */}
       <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="/payment/success" element={<PaymentSuccessPage />} />
     </Routes>
   );
 }

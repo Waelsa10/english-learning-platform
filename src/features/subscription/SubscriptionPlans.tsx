@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Check } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/common/Card';
@@ -6,6 +6,7 @@ import { Button } from '@/components/common/Button';
 import { Badge } from '@/components/common/Badge';
 import { ApplyPromoCode } from './ApplyPromoCode';
 import { formatCurrency } from '@/utils/formatters';
+import { openPaddleCheckout, PADDLE_PRICES } from '@/lib/paddle';
 import toast from 'react-hot-toast';
 
 const plans = [
@@ -14,6 +15,7 @@ const plans = [
     name: 'Basic',
     price: 29,
     currency: 'USD',
+    paddlePriceId: PADDLE_PRICES.basic_monthly,
     features: [
       '1 Teacher Assignment',
       '10 Assignments per month',
@@ -26,6 +28,7 @@ const plans = [
     name: 'Premium',
     price: 49,
     currency: 'USD',
+    paddlePriceId: PADDLE_PRICES.premium_monthly,
     popular: true,
     features: [
       'Everything in Basic',
@@ -40,6 +43,7 @@ const plans = [
     name: 'Enterprise',
     price: 99,
     currency: 'USD',
+    paddlePriceId: PADDLE_PRICES.enterprise_monthly,
     features: [
       'Everything in Premium',
       'Multiple Teachers',
@@ -68,45 +72,28 @@ export const SubscriptionPlans: React.FC = () => {
     setIsProcessing(true);
     
     try {
-      // UPDATED: Tap Payments integration
-      const TAP_PUBLIC_KEY = import.meta.env.VITE_TAP_PUBLIC_KEY;
-      
-      // Initialize Tap Payments
-      const tapInstance = (window as any).Tap(TAP_PUBLIC_KEY);
-      
-      // Configure payment
-      const paymentConfig = {
-        amount: finalPrice,
-        currency: selectedPlanData.currency,
-        customer: {
-          first_name: user.profile.fullName.split(' ')[0],
-          last_name: user.profile.fullName.split(' ').slice(1).join(' ') || '',
-          email: user.email,
-          phone: {
-            country_code: '966',
-            number: user.profile.phoneNumber || '500000000',
+      await openPaddleCheckout({
+        items: [
+          {
+            priceId: selectedPlanData.paddlePriceId,
+            quantity: 1,
           },
-        },
-        description: `${selectedPlanData.name} Plan Subscription`,
-        metadata: {
-          studentId: user.uid,
+        ],
+        customData: {
+          userId: user.uid,
           plan: selectedPlan,
           discountPercentage,
         },
-        redirect: {
-          url: `${import.meta.env.VITE_APP_URL}/subscription/success`,
+        customer: {
+          email: user.email,
         },
-        post: {
-          url: `${import.meta.env.VITE_APP_URL}/api/tap-webhook`,
-        },
-      };
+      });
 
-      // Open Tap payment page
-      tapInstance.open(paymentConfig);
+      toast.success('Checkout opened! Complete your payment.');
       
     } catch (error) {
       console.error('Payment error:', error);
-      toast.error('Failed to process payment. Please try again.');
+      toast.error('Failed to open checkout. Please try again.');
     } finally {
       setIsProcessing(false);
     }
@@ -125,7 +112,7 @@ export const SubscriptionPlans: React.FC = () => {
           >
             {plan.popular && (
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <Badge variant="default">Most Popular</Badge>
+                <Badge variant="info">Most Popular</Badge>
               </div>
             )}
             <CardHeader>
@@ -149,8 +136,7 @@ export const SubscriptionPlans: React.FC = () => {
                 ))}
               </ul>
               <Button
-                variant={selectedPlan === plan.id ? 'default' : 'outline'}
-                className="w-full"
+                variant={selectedPlan === plan.id ? 'primary' : 'outline'}
                 onClick={() => setSelectedPlan(plan.id)}
               >
                 {selectedPlan === plan.id ? 'Selected' : 'Select Plan'}
@@ -204,11 +190,10 @@ export const SubscriptionPlans: React.FC = () => {
           <div className="pt-3 border-t">
             <p className="text-sm text-muted-foreground mb-3">We accept:</p>
             <div className="flex flex-wrap gap-2">
-              <Badge variant="outline">Visa</Badge>
-              <Badge variant="outline">Mastercard</Badge>
-              <Badge variant="outline">Mada</Badge>
-              <Badge variant="outline">Apple Pay</Badge>
-              <Badge variant="outline">STC Pay</Badge>
+              <Badge variant="outline">💳 Credit Card</Badge>
+              <Badge variant="outline">🍎 Apple Pay</Badge>
+              <Badge variant="outline">📱 Google Pay</Badge>
+              <Badge variant="outline">💰 PayPal</Badge>
             </div>
           </div>
 
@@ -222,7 +207,7 @@ export const SubscriptionPlans: React.FC = () => {
           </Button>
           
           <p className="text-xs text-center text-muted-foreground">
-            Secured by Tap Payments • Cancel anytime
+            Secured by Paddle • 14-day money-back guarantee • Cancel anytime
           </p>
         </CardContent>
       </Card>
