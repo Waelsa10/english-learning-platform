@@ -1,0 +1,590 @@
+[00:00:00.885] Server  LOG      ✓ Ready in 580ms
+[00:00:04.658] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:45.758] Server  ERROR    ⨯ ./app/page.js:12:1
+Module not found: Can't resolve './styles.css'
+  10 |   FaDollarSign,
+  11 | } from "react-icons/fa";
+> 12 | import "./styles.css"; // import your custom CSS
+     | ^^^^^^^^^^^^^^^^^^^^^^
+  13 |
+  14 | export default function Home() {
+  15 |   const [data] = useState({
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/page.js [Client Component Browser]
+    ./app/page.js [Server Component]
+
+  Client Component SSR:
+    ./app/page.js [Client Component SSR]
+    ./app/page.js [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:00:45.760] Server  ERROR    ⨯ ./app/page.js:12:1
+Module not found: Can't resolve './styles.css'
+  10 |   FaDollarSign,
+  11 | } from "react-icons/fa";
+> 12 | import "./styles.css"; // import your custom CSS
+     | ^^^^^^^^^^^^^^^^^^^^^^
+  13 |
+  14 | export default function Home() {
+  15 |   const [data] = useState({
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/page.js [Client Component Browser]
+    ./app/page.js [Server Component]
+
+  Client Component SSR:
+    ./app/page.js [Client Component SSR]
+    ./app/page.js [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:00:45.762] Server  ERROR    ⨯ ./app/page.js:12:1
+Module not found: Can't resolve './styles.css'
+  10 |   FaDollarSign,
+  11 | } from "react-icons/fa";
+> 12 | import "./styles.css"; // import your custom CSS
+     | ^^^^^^^^^^^^^^^^^^^^^^
+  13 |
+  14 | export default function Home() {
+  15 |   const [data] = useState({
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/page.js [Client Component Browser]
+    ./app/page.js [Server Component]
+
+  Client Component SSR:
+    ./app/page.js [Client Component SSR]
+    ./app/page.js [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:00:45.763] Server  ERROR    ⨯ ./app/page.js:12:1
+Module not found: Can't resolve './styles.css'
+  10 |   FaDollarSign,
+  11 | } from "react-icons/fa";
+> 12 | import "./styles.css"; // import your custom CSS
+     | ^^^^^^^^^^^^^^^^^^^^^^
+  13 |
+  14 | export default function Home() {
+  15 |   const [data] = useState({
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/page.js [Client Component Browser]
+    ./app/page.js [Server Component]
+
+  Client Component SSR:
+    ./app/page.js [Client Component SSR]
+    ./app/page.js [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:00:45.765] Server  ERROR    ⨯ ./app/page.js:12:1
+Module not found: Can't resolve './styles.css'
+  10 |   FaDollarSign,
+  11 | } from "react-icons/fa";
+> 12 | import "./styles.css"; // import your custom CSS
+     | ^^^^^^^^^^^^^^^^^^^^^^
+  13 |
+  14 | export default function Home() {
+  15 |   const [data] = useState({
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/page.js [Client Component Browser]
+    ./app/page.js [Server Component]
+
+  Client Component SSR:
+    ./app/page.js [Client Component SSR]
+    ./app/page.js [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:00:45.766] Server  ERROR    ⨯ ./app/page.js:12:1
+Module not found: Can't resolve './styles.css'
+  10 |   FaDollarSign,
+  11 | } from "react-icons/fa";
+> 12 | import "./styles.css"; // import your custom CSS
+     | ^^^^^^^^^^^^^^^^^^^^^^
+  13 |
+  14 | export default function Home() {
+  15 |   const [data] = useState({
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/page.js [Client Component Browser]
+    ./app/page.js [Server Component]
+
+  Client Component SSR:
+    ./app/page.js [Client Component SSR]
+    ./app/page.js [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:00:45.768] Server  ERROR    ⨯ ./app/page.js:12:1
+Module not found: Can't resolve './styles.css'
+  10 |   FaDollarSign,
+  11 | } from "react-icons/fa";
+> 12 | import "./styles.css"; // import your custom CSS
+     | ^^^^^^^^^^^^^^^^^^^^^^
+  13 |
+  14 | export default function Home() {
+  15 |   const [data] = useState({
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/page.js [Client Component Browser]
+    ./app/page.js [Server Component]
+
+  Client Component SSR:
+    ./app/page.js [Client Component SSR]
+    ./app/page.js [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:00:45.769] Server  ERROR    ⨯ ./app/page.js:12:1
+Module not found: Can't resolve './styles.css'
+  10 |   FaDollarSign,
+  11 | } from "react-icons/fa";
+> 12 | import "./styles.css"; // import your custom CSS
+     | ^^^^^^^^^^^^^^^^^^^^^^
+  13 |
+  14 | export default function Home() {
+  15 |   const [data] = useState({
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/page.js [Client Component Browser]
+    ./app/page.js [Server Component]
+
+  Client Component SSR:
+    ./app/page.js [Client Component SSR]
+    ./app/page.js [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:00:45.770] Server  ERROR    ⨯ ./app/page.js:12:1
+Module not found: Can't resolve './styles.css'
+  10 |   FaDollarSign,
+  11 | } from "react-icons/fa";
+> 12 | import "./styles.css"; // import your custom CSS
+     | ^^^^^^^^^^^^^^^^^^^^^^
+  13 |
+  14 | export default function Home() {
+  15 |   const [data] = useState({
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/page.js [Client Component Browser]
+    ./app/page.js [Server Component]
+
+  Client Component SSR:
+    ./app/page.js [Client Component SSR]
+    ./app/page.js [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:00:45.771] Server  ERROR    ⨯ ./app/page.js:12:1
+Module not found: Can't resolve './styles.css'
+  10 |   FaDollarSign,
+  11 | } from "react-icons/fa";
+> 12 | import "./styles.css"; // import your custom CSS
+     | ^^^^^^^^^^^^^^^^^^^^^^
+  13 |
+  14 | export default function Home() {
+  15 |   const [data] = useState({
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/page.js [Client Component Browser]
+    ./app/page.js [Server Component]
+
+  Client Component SSR:
+    ./app/page.js [Client Component SSR]
+    ./app/page.js [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:00:45.773] Server  ERROR    ⨯ ./app/page.js:12:1
+Module not found: Can't resolve './styles.css'
+  10 |   FaDollarSign,
+  11 | } from "react-icons/fa";
+> 12 | import "./styles.css"; // import your custom CSS
+     | ^^^^^^^^^^^^^^^^^^^^^^
+  13 |
+  14 | export default function Home() {
+  15 |   const [data] = useState({
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/page.js [Client Component Browser]
+    ./app/page.js [Server Component]
+
+  Client Component SSR:
+    ./app/page.js [Client Component SSR]
+    ./app/page.js [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:00:45.774] Server  ERROR    ⨯ ./app/page.js:12:1
+Module not found: Can't resolve './styles.css'
+  10 |   FaDollarSign,
+  11 | } from "react-icons/fa";
+> 12 | import "./styles.css"; // import your custom CSS
+     | ^^^^^^^^^^^^^^^^^^^^^^
+  13 |
+  14 | export default function Home() {
+  15 |   const [data] = useState({
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/page.js [Client Component Browser]
+    ./app/page.js [Server Component]
+
+  Client Component SSR:
+    ./app/page.js [Client Component SSR]
+    ./app/page.js [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:00:45.775] Server  ERROR    ⨯ ./app/page.js:12:1
+Module not found: Can't resolve './styles.css'
+  10 |   FaDollarSign,
+  11 | } from "react-icons/fa";
+> 12 | import "./styles.css"; // import your custom CSS
+     | ^^^^^^^^^^^^^^^^^^^^^^
+  13 |
+  14 | export default function Home() {
+  15 |   const [data] = useState({
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/page.js [Client Component Browser]
+    ./app/page.js [Server Component]
+
+  Client Component SSR:
+    ./app/page.js [Client Component SSR]
+    ./app/page.js [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:00:45.776] Server  ERROR    ⨯ ./app/page.js:12:1
+Module not found: Can't resolve './styles.css'
+  10 |   FaDollarSign,
+  11 | } from "react-icons/fa";
+> 12 | import "./styles.css"; // import your custom CSS
+     | ^^^^^^^^^^^^^^^^^^^^^^
+  13 |
+  14 | export default function Home() {
+  15 |   const [data] = useState({
+
+
+
+Import traces:
+  Client Component Browser:
+    ./app/page.js [Client Component Browser]
+    ./app/page.js [Server Component]
+
+  Client Component SSR:
+    ./app/page.js [Client Component SSR]
+    ./app/page.js [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:00:45.792] Server  LOG      ✓ Compiled in 22ms
+[00:00:46.046] Browser ERROR   ./app/page.js:12:1
+Module not found: Can't resolve './styles.css'
+  10 |   FaDollarSign,
+  11 | } from "react-icons/fa";
+> 12 | import "./styles.css"; // import your custom CSS
+     | ^^^^^^^^^^^^^^^^^^^^^^
+  13 |
+  14 | export default function Home() {
+  15 |   const [data] = useState({
+
+Import traces:
+  Client Component Browser:
+    ./app/page.js [Client Component Browser]
+    ./app/page.js [Server Component]
+
+  Client Component SSR:
+    ./app/page.js [Client Component SSR]
+    ./app/page.js [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[00:01:19.869] Server  ERROR    ⨯ ./app/layout.js:1:1
+Module not found: Can't resolve './globals.css'
+> 1 | import "./globals.css";
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+  2 |
+  3 | export const metadata = {
+  4 |   title: "CRM Dashboard",
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:01:19.872] Server  ERROR    ⨯ ./app/layout.js:1:1
+Module not found: Can't resolve './globals.css'
+> 1 | import "./globals.css";
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+  2 |
+  3 | export const metadata = {
+  4 |   title: "CRM Dashboard",
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:01:19.890] Server  ERROR    ⨯ ./app/layout.js:1:1
+Module not found: Can't resolve './globals.css'
+> 1 | import "./globals.css";
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+  2 |
+  3 | export const metadata = {
+  4 |   title: "CRM Dashboard",
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:01:19.891] Server  ERROR    ⨯ ./app/layout.js:1:1
+Module not found: Can't resolve './globals.css'
+> 1 | import "./globals.css";
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+  2 |
+  3 | export const metadata = {
+  4 |   title: "CRM Dashboard",
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:01:19.892] Server  ERROR    ⨯ ./app/layout.js:1:1
+Module not found: Can't resolve './globals.css'
+> 1 | import "./globals.css";
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+  2 |
+  3 | export const metadata = {
+  4 |   title: "CRM Dashboard",
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:01:19.897] Server  ERROR    ⨯ ./app/layout.js:1:1
+Module not found: Can't resolve './globals.css'
+> 1 | import "./globals.css";
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+  2 |
+  3 | export const metadata = {
+  4 |   title: "CRM Dashboard",
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:01:19.898] Server  ERROR    ⨯ ./app/layout.js:1:1
+Module not found: Can't resolve './globals.css'
+> 1 | import "./globals.css";
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+  2 |
+  3 | export const metadata = {
+  4 |   title: "CRM Dashboard",
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:01:19.931] Server  LOG      ✓ Compiled in 41ms
+[00:01:20.040] Browser ERROR   ./app/layout.js:1:1
+Module not found: Can't resolve './globals.css'
+> 1 | import "./globals.css";
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+  2 |
+  3 | export const metadata = {
+  4 |   title: "CRM Dashboard",
+
+https://nextjs.org/docs/messages/module-not-found
+[00:01:25.731] Server  ERROR    ⨯ ./app/layout.js:1:1
+Module not found: Can't resolve './globals.css'
+> 1 | import "./globals.css";
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+  2 |
+  3 | export const metadata = {
+  4 |   title: "CRM Dashboard",
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:01:25.732] Server  ERROR    ⨯ ./app/layout.js:1:1
+Module not found: Can't resolve './globals.css'
+> 1 | import "./globals.css";
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+  2 |
+  3 | export const metadata = {
+  4 |   title: "CRM Dashboard",
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:01:25.732] Server  ERROR    ⨯ ./app/layout.js:1:1
+Module not found: Can't resolve './globals.css'
+> 1 | import "./globals.css";
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+  2 |
+  3 | export const metadata = {
+  4 |   title: "CRM Dashboard",
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:01:26.036] Browser ERROR   ./app/layout.js:1:1
+Module not found: Can't resolve './globals.css'
+> 1 | import "./globals.css";
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+  2 |
+  3 | export const metadata = {
+  4 |   title: "CRM Dashboard",
+
+https://nextjs.org/docs/messages/module-not-found
+[00:01:27.692] Server  ERROR    ⨯ ./app/layout.js:1:1
+Module not found: Can't resolve './globals.css'
+> 1 | import "./globals.css";
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+  2 |
+  3 | export const metadata = {
+  4 |   title: "CRM Dashboard",
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:01:27.812] Browser ERROR   ./app/layout.js:1:1
+Module not found: Can't resolve './globals.css'
+> 1 | import "./globals.css";
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+  2 |
+  3 | export const metadata = {
+  4 |   title: "CRM Dashboard",
+
+https://nextjs.org/docs/messages/module-not-found
+[00:01:28.495] Browser ERROR   ./app/layout.js:1:1
+Module not found: Can't resolve './globals.css'
+> 1 | import "./globals.css";
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+  2 |
+  3 | export const metadata = {
+  4 |   title: "CRM Dashboard",
+
+https://nextjs.org/docs/messages/module-not-found
+[00:01:28.495] Browser ERROR   ./app/layout.js:1:1
+Module not found: Can't resolve './globals.css'
+> 1 | import "./globals.css";
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+  2 |
+  3 | export const metadata = {
+  4 |   title: "CRM Dashboard",
+
+https://nextjs.org/docs/messages/module-not-found
+[00:01:29.124] Browser ERROR   uncaughtError: Error: ./app/layout.js:1:1
+Module not found: Can't resolve './globals.css'
+> 1 | import "./globals.css";
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+  2 |
+  3 | export const metadata = {
+  4 |   title: "CRM Dashboard",
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:01:29.312] Browser ERROR   ./app/layout.js:1:1
+Module not found: Can't resolve './globals.css'
+> 1 | import "./globals.css";
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+  2 |
+  3 | export const metadata = {
+  4 |   title: "CRM Dashboard",
+
+https://nextjs.org/docs/messages/module-not-found
+[00:01:29.312] Browser ERROR   ./app/layout.js:1:1
+Module not found: Can't resolve './globals.css'
+> 1 | import "./globals.css";
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+  2 |
+  3 | export const metadata = {
+  4 |   title: "CRM Dashboard",
+
+https://nextjs.org/docs/messages/module-not-found
+[00:01:29.312] Browser ERROR   ./app/layout.js:1:1
+Module not found: Can't resolve './globals.css'
+> 1 | import "./globals.css";
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+  2 |
+  3 | export const metadata = {
+  4 |   title: "CRM Dashboard",
+
+https://nextjs.org/docs/messages/module-not-found
+[00:01:51.010] Server  LOG      ✓ Compiled in 15ms
+[00:01:51.446] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold

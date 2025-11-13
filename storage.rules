@@ -1,0 +1,56 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    function isValidImageFile() {
+      return request.resource.contentType.matches('image/.*') &&
+             request.resource.size < 5 * 1024 * 1024; // 5MB
+    }
+    
+    function isValidDocumentFile() {
+      return request.resource.contentType.matches('(application/pdf|application/msword|application/vnd.openxmlformats-officedocument.wordprocessingml.document)') &&
+             request.resource.size < 10 * 1024 * 1024; // 10MB
+    }
+    
+    function isValidAudioFile() {
+      return request.resource.contentType.matches('audio/.*') &&
+             request.resource.size < 10 * 1024 * 1024; // 10MB
+    }
+    
+    // Profile pictures
+    match /profile_pictures/{userId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isOwner(userId) && isValidImageFile();
+    }
+    
+    // Assignment resources
+    match /assignment_resources/{teacherId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isOwner(teacherId) && 
+        (isValidDocumentFile() || isValidImageFile() || isValidAudioFile());
+    }
+    
+    // Submission files
+    match /submissions/{studentId}/{submissionId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isOwner(studentId) && 
+        (isValidDocumentFile() || isValidImageFile() || isValidAudioFile());
+    }
+    
+    // Chat attachments
+    match /chat_attachments/{userId}/{conversationId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isOwner(userId) && 
+        (isValidDocumentFile() || isValidImageFile());
+    }
+  }
+}

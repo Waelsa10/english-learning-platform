@@ -1,0 +1,163 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && getUserData().role == 'admin';
+    }
+    
+    function isTeacher() {
+      return isAuthenticated() && getUserData().role == 'teacher';
+    }
+    
+    function isStudent() {
+      return isAuthenticated() && getUserData().role == 'student';
+    }
+    
+    function getTeacherData() {
+      return get(/databases/$(database)/documents/teachers/$(request.auth.uid)).data;
+    }
+    
+    function isAssignedTeacher(studentId) {
+      return isTeacher() && studentId in getTeacherData().assignedStudents;
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (
+        isOwner(userId) || 
+        isAdmin() ||
+        (isTeacher() && isAssignedTeacher(userId))
+      );
+      allow create: if isAuthenticated() && isOwner(userId);
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // Students collection
+    match /students/{studentId} {
+      allow read: if isAuthenticated() && (
+        isOwner(studentId) || 
+        isAdmin() || 
+        isAssignedTeacher(studentId)
+      );
+      allow create: if isAuthenticated() && isOwner(studentId);
+      allow update: if isOwner(studentId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // Teachers collection
+    match /teachers/{teacherId} {
+      allow read: if isAuthenticated();
+      allow create: if isAdmin();
+      allow update: if isOwner(teacherId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // Assignments collection
+    match /assignments/{assignmentId} {
+      allow read: if isAuthenticated() && (
+        isAdmin() ||
+        resource.data.createdBy == request.auth.uid ||
+        request.auth.uid in resource.data.assignedTo
+      );
+      allow create: if isTeacher() || isAdmin();
+      allow update: if isAdmin() || (
+        isTeacher() && resource.data.createdBy == request.auth.uid
+      );
+      allow delete: if isAdmin() || (
+        isTeacher() && resource.data.createdBy == request.auth.uid
+      );
+    }
+    
+    // Submissions collection
+    match /submissions/{submissionId} {
+      allow read: if isAuthenticated() && (
+        isAdmin() ||
+        resource.data.studentId == request.auth.uid ||
+        (isTeacher() && isAssignedTeacher(resource.data.studentId))
+      );
+      allow create: if isStudent() && request.resource.data.studentId == request.auth.uid;
+      allow update: if isAdmin() || (
+        isStudent() && resource.data.studentId == request.auth.uid && resource.data.status == 'draft'
+      ) || (
+        isTeacher() && isAssignedTeacher(resource.data.studentId)
+      );
+      allow delete: if isAdmin();
+    }
+    
+    // Conversations collection
+    match /conversations/{conversationId} {
+      allow read: if isAuthenticated() && 
+        request.auth.uid in resource.data.participants;
+      allow create: if isAuthenticated() && 
+        request.auth.uid in request.resource.data.participants;
+      allow update: if isAuthenticated() && 
+        request.auth.uid in resource.data.participants;
+      allow delete: if isAdmin();
+    }
+    
+    // Messages collection
+    match /messages/{messageId} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid == resource.data.senderId || 
+        request.auth.uid == resource.data.receiverId
+      );
+      allow create: if isAuthenticated() && 
+        request.auth.uid == request.resource.data.senderId;
+      allow update: if isAuthenticated() && (
+        request.auth.uid == resource.data.receiverId // Can mark as read
+      );
+      allow delete: if isAuthenticated() && 
+        request.auth.uid == resource.data.senderId;
+    }
+    
+    // Notifications collection
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated() && 
+        request.auth.uid == resource.data.recipientId;
+      allow create: if isAdmin() || isTeacher();
+      allow update: if isAuthenticated() && 
+        request.auth.uid == resource.data.recipientId;
+      allow delete: if isAuthenticated() && 
+        request.auth.uid == resource.data.recipientId;
+    }
+    
+    // Teacher Invitations (admin only)
+    match /teacher_invitations/{invitationId} {
+      allow read: if isAdmin() || 
+        resource.data.email == request.auth.token.email;
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // Teacher Applications
+    match /teacher_applications/{applicationId} {
+      allow read: if isAdmin() || 
+        resource.data.applicantEmail == request.auth.token.email;
+      allow create: if isAuthenticated();
+      allow update, delete: if isAdmin();
+    }
+    
+    // Payment History
+    match /payment_history/{paymentId} {
+      allow read: if isAuthenticated() && (
+        isAdmin() || 
+        resource.data.userId == request.auth.uid
+      );
+      allow create, update, delete: if isAdmin();
+    }
+  }
+}
