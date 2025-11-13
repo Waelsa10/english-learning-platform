@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Mail, Lock, Eye, EyeOff, Shield } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Shield, ArrowLeft } from 'lucide-react';
 import { signIn } from '@/lib/firebase/auth';
 import { getUserByUid } from '@/lib/firebase/firestore';
 import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
 import toast from 'react-hot-toast';
+import { signOut } from '@/lib/firebase/auth';
 
 const adminLoginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -43,7 +44,6 @@ export const AdminLogin: React.FC = () => {
         return;
       }
 
-      // ✅ Check if user is actually an admin
       if (userData.role !== 'admin') {
         toast.error('Access denied. Admin credentials required.');
         await signOut();
@@ -64,6 +64,15 @@ export const AdminLogin: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
       <div className="w-full max-w-md">
+        {/* ✅ Back Button */}
+        <Link 
+          to="/" 
+          className="inline-flex items-center gap-2 text-sm text-purple-200 hover:text-white transition-colors mb-4"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to home</span>
+        </Link>
+
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-600 rounded-full mb-4">
@@ -130,12 +139,12 @@ export const AdminLogin: React.FC = () => {
         <div className="text-center mt-6">
           <p className="text-sm text-purple-200">
             Not an admin?{' '}
-            <a 
-              href="/login" 
+            <Link 
+              to="/login" 
               className="text-white hover:underline font-medium"
             >
               Go to main login
-            </a>
+            </Link>
           </p>
         </div>
       </div>

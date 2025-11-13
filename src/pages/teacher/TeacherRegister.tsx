@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Mail, Lock, Eye, EyeOff, User, Phone, GraduationCap, Briefcase } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, User, Phone, GraduationCap, Briefcase, ArrowLeft } from 'lucide-react';
 import { registerTeacher } from '@/lib/firebase/auth';
 import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/common/Button';
@@ -66,6 +66,15 @@ export const TeacherRegister: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
       <div className="w-full max-w-2xl">
+        {/* ✅ Back Button */}
+        <Link 
+          to="/" 
+          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors mb-4"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to home</span>
+        </Link>
+
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-600 rounded-full mb-4">
