@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
-import { useNotifications } from '@/hooks/useNotifications';
 import { useUIStore } from '@/store/uiStore';
 import { Toast } from '@/components/common/Toast';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
@@ -19,7 +18,7 @@ import { AdminDashboard } from '@/features/dashboard/AdminDashboard';
 import { AssignmentList } from '@/features/assignments/AssignmentList';
 import { AssignmentCreate } from '@/features/assignments/AssignmentCreate';
 import { MessagesList } from '@/features/messages/MessagesList';
-import { PaymentSuccessPage } from '@/pages/PaymentSuccessPage';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -33,7 +32,6 @@ function App() {
   const { theme } = useUIStore();
 
   useEffect(() => {
-    // Apply theme
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
 
@@ -49,7 +47,8 @@ function App() {
 
 function AppContent() {
   const { user, isLoading } = useAuth();
-  useNotifications();
+  // ❌ REMOVE THIS LINE:
+  // useNotifications();
 
   if (isLoading) {
     return <PageSpinner />;
@@ -103,7 +102,6 @@ function AppContent() {
 
       {/* 404 */}
       <Route path="*" element={<Navigate to="/" replace />} />
-      <Route path="/payment/success" element={<PaymentSuccessPage />} />
     </Routes>
   );
 }

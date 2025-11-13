@@ -15,12 +15,12 @@ export const useNotifications = () => {
       return getUserNotifications(user.uid);
     },
     enabled: !!user,
-    refetchInterval: 30000, // Refetch every 30 seconds
+    refetchInterval: 30000,
   });
 
   useEffect(() => {
     setNotifications(notifications);
-  }, [notifications, setNotifications]);
+  }, [notifications]); // ✅ REMOVED setNotifications from dependencies
 
   return { notifications, isLoading };
 };
