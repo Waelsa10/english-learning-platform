@@ -39,10 +39,13 @@ export const Header: React.FC = () => {
       .slice(0, 2);
   };
 
+  if (!user) {
+    return null;
+  }
+
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4">
-        {/* Left Section */}
         <div className="flex items-center gap-4">
           <button
             onClick={toggleSidebar}
@@ -61,9 +64,7 @@ export const Header: React.FC = () => {
           </Link>
         </div>
 
-        {/* Right Section */}
         <div className="flex items-center gap-2">
-          {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
             className="p-2 rounded-lg hover:bg-accent transition-colors"
@@ -75,7 +76,6 @@ export const Header: React.FC = () => {
             )}
           </button>
 
-          {/* Notifications */}
           <Link
             to="/notifications"
             className="p-2 rounded-lg hover:bg-accent transition-colors relative"
@@ -86,19 +86,18 @@ export const Header: React.FC = () => {
             )}
           </Link>
 
-          {/* User Menu */}
           <div className="relative">
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
               className="flex items-center gap-2 p-1 rounded-lg hover:bg-accent transition-colors"
             >
               <Avatar
-                src={user?.profile.profilePicture}
-                fallback={getInitials(user?.profile.fullName || 'User')}
+                src={user?.profile?.profilePicture}
+                fallback={getInitials(user?.profile?.fullName || 'User')}
                 size="sm"
               />
               <span className="hidden md:inline font-medium">
-                {user?.profile.fullName}
+                {user?.profile?.fullName || user?.email || 'User'}
               </span>
             </button>
 
@@ -110,10 +109,10 @@ export const Header: React.FC = () => {
                 />
                 <div className="absolute right-0 mt-2 w-56 bg-background border rounded-lg shadow-lg z-50">
                   <div className="p-3 border-b">
-                    <p className="font-medium">{user?.profile.fullName}</p>
+                    <p className="font-medium">{user?.profile?.fullName || 'User'}</p>
                     <p className="text-sm text-muted-foreground">{user?.email}</p>
                     <Badge variant="info" className="mt-1">
-                      {user?.role}
+                      {user?.role || 'user'}
                     </Badge>
                   </div>
                   <div className="p-1">

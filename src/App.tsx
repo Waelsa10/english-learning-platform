@@ -12,6 +12,9 @@ import { PageSpinner } from '@/components/common/Spinner';
 import { LandingPage } from '@/pages/LandingPage';
 import { LoginPage } from '@/pages/LoginPage';
 import { RegisterPage } from '@/pages/RegisterPage';
+import { AdminLogin } from '@/pages/admin/AdminLogin';
+import { TeacherLogin } from '@/pages/teacher/TeacherLogin';
+import { TeacherRegister } from '@/pages/teacher/TeacherRegister';
 import { StudentDashboard } from '@/features/dashboard/StudentDashboard';
 import { TeacherDashboard } from '@/features/dashboard/TeacherDashboard';
 import { AdminDashboard } from '@/features/dashboard/AdminDashboard';
@@ -47,8 +50,6 @@ function App() {
 
 function AppContent() {
   const { user, isLoading } = useAuth();
-  // ❌ REMOVE THIS LINE:
-  // useNotifications();
 
   if (isLoading) {
     return <PageSpinner />;
@@ -58,15 +59,125 @@ function AppContent() {
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<LandingPage />} />
-      <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <LoginPage />} />
-      <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <RegisterPage />} />
+      
+      {/* Student Login */}
+      <Route 
+        path="/login" 
+        element={
+          user ? (
+            user.role === 'admin' ? (
+              <Navigate to="/admin/dashboard" replace />
+            ) : user.role === 'teacher' ? (
+              <Navigate to="/teacher/dashboard" replace />
+            ) : (
+              <Navigate to="/dashboard" replace />
+            )
+          ) : (
+            <LoginPage />
+          )
+        } 
+      />
 
-      {/* Protected Routes */}
+      {/* Student Register */}
+      <Route 
+        path="/register" 
+        element={
+          user ? (
+            user.role === 'admin' ? (
+              <Navigate to="/admin/dashboard" replace />
+            ) : user.role === 'teacher' ? (
+              <Navigate to="/teacher/dashboard" replace />
+            ) : (
+              <Navigate to="/dashboard" replace />
+            )
+          ) : (
+            <RegisterPage />
+          )
+        } 
+      />
+      
+      {/* Teacher Login */}
+      <Route 
+        path="/teacher/login" 
+        element={
+          user ? (
+            user.role === 'teacher' ? (
+              <Navigate to="/teacher/dashboard" replace />
+            ) : user.role === 'admin' ? (
+              <Navigate to="/admin/dashboard" replace />
+            ) : (
+              <Navigate to="/dashboard" replace />
+            )
+          ) : (
+            <TeacherLogin />
+          )
+        } 
+      />
+
+      {/* Teacher Register */}
+      <Route 
+        path="/teacher/register" 
+        element={
+          user ? (
+            user.role === 'teacher' ? (
+              <Navigate to="/teacher/dashboard" replace />
+            ) : user.role === 'admin' ? (
+              <Navigate to="/admin/dashboard" replace />
+            ) : (
+              <Navigate to="/dashboard" replace />
+            )
+          ) : (
+            <TeacherRegister />
+          )
+        } 
+      />
+      
+      {/* Admin Login */}
+      <Route 
+        path="/admin/login" 
+        element={
+          user?.role === 'admin' ? (
+            <Navigate to="/admin/dashboard" replace />
+          ) : user?.role === 'teacher' ? (
+            <Navigate to="/teacher/dashboard" replace />
+          ) : user ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <AdminLogin />
+          )
+        } 
+      />
+
+      {/* Admin Dashboard */}
+      <Route
+        path="/admin/dashboard"
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <MainLayout>
+              <AdminDashboard />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Teacher Dashboard */}
+      <Route
+        path="/teacher/dashboard"
+        element={
+          <ProtectedRoute allowedRoles={['teacher']}>
+            <MainLayout>
+              <TeacherDashboard />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Protected Routes - Students & Teachers */}
       <Route element={<MainLayout />}>
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}>
+            <ProtectedRoute allowedRoles={['student']}>
               <DashboardRouter />
             </ProtectedRoute>
           }
@@ -100,8 +211,21 @@ function AppContent() {
         />
       </Route>
 
-      {/* 404 */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      {/* 404 - Redirect based on user */}
+      <Route 
+        path="*" 
+        element={
+          user?.role === 'admin' ? (
+            <Navigate to="/admin/dashboard" replace />
+          ) : user?.role === 'teacher' ? (
+            <Navigate to="/teacher/dashboard" replace />
+          ) : user ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        } 
+      />
     </Routes>
   );
 }
@@ -115,9 +239,11 @@ function DashboardRouter() {
     case 'student':
       return <StudentDashboard />;
     case 'teacher':
-      return <TeacherDashboard />;
+      // Teacher should use /teacher/dashboard, redirect if somehow here
+      return <Navigate to="/teacher/dashboard" replace />;
     case 'admin':
-      return <AdminDashboard />;
+      // Admin should use /admin/dashboard, redirect if somehow here
+      return <Navigate to="/admin/dashboard" replace />;
     default:
       return <Navigate to="/" replace />;
   }

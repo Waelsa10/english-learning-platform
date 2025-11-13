@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { Shield, GraduationCap } from 'lucide-react';
 import { LoginForm } from '@/features/auth/LoginForm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/common/Card';
 
@@ -17,6 +19,29 @@ export const LoginPage: React.FC = () => {
         </CardHeader>
         <CardContent>
           <LoginForm />
+          
+          {/* ✅ Other Login Options */}
+          <div className="mt-8 pt-6 border-t border-border">
+            <div className="text-center space-y-3">
+              {/* Teacher Login Link */}
+              <Link 
+                to="/teacher/login" 
+                className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <GraduationCap className="w-4 h-4" />
+                <span>Teacher Login</span>
+              </Link>
+              
+              {/* Admin Portal Link */}
+              <Link 
+                to="/admin/login" 
+                className="flex items-center justify-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Shield className="w-3 h-3" />
+                <span>Admin Portal</span>
+              </Link>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

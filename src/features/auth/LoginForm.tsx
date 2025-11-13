@@ -40,8 +40,22 @@ export const LoginForm: React.FC = () => {
 
       if (userData) {
         setUser(userData);
-        toast.success('Welcome back!');
-        navigate('/dashboard');
+        toast.success(`Welcome back, ${userData.profile?.fullName || 'User'}!`);
+        
+        // ✅ FIXED: Role-based navigation
+        switch (userData.role) {
+          case 'admin':
+            navigate('/admin/dashboard');
+            break;
+          case 'teacher':
+            navigate('/teacher/dashboard');
+            break;
+          case 'student':
+            navigate('/student/dashboard');
+            break;
+          default:
+            navigate('/dashboard');
+        }
       } else {
         toast.error('User data not found');
       }
@@ -105,8 +119,6 @@ export const LoginForm: React.FC = () => {
         <Button type="submit" className="w-full" isLoading={isLoading}>
           Sign In
         </Button>
-
-        {/* ❌ REMOVED Google Sign In Button */}
       </form>
 
       <p className="mt-6 text-center text-sm text-muted-foreground">

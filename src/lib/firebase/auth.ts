@@ -24,6 +24,20 @@ interface RegisterStudentData {
   learningGoals: string[];
 }
 
+interface RegisterAdminData {
+  email: string;
+  password: string;
+  fullName: string;
+}
+interface RegisterTeacherData {
+  email: string;
+  password: string;
+  fullName: string;
+  phoneNumber?: string;
+  specialization?: string;
+  experience?: string;
+}
+
 export const registerStudent = async (data: RegisterStudentData) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(
@@ -114,6 +128,111 @@ export const registerStudent = async (data: RegisterStudentData) => {
     throw new Error(error.message || 'Failed to register');
   }
 };
+export const registerTeacher = async (data: RegisterTeacherData) => {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      data.email,
+      data.password
+    );
+
+    const user = userCredential.user;
+
+    await updateProfile(user, {
+      displayName: data.fullName,
+    });
+
+    const teacherData = {
+      email: data.email,
+      role: 'teacher',
+      profile: {
+        fullName: data.fullName,
+        phoneNumber: data.phoneNumber,
+        specialization: data.specialization || 'English Teaching',
+        experience: data.experience || '',
+      },
+      settings: {
+        theme: 'light',
+        notifications: {
+          email: true,
+          push: true,
+          sms: false,
+        },
+      },
+      metadata: {
+        createdAt: serverTimestamp(),
+        lastLogin: serverTimestamp(),
+        isActive: true,
+        isEmailVerified: false,
+      },
+      assignedStudents: [],
+      status: 'pending', // Pending admin approval
+    };
+
+    await setDoc(doc(db, 'users', user.uid), teacherData);
+    await setDoc(doc(db, 'teachers', user.uid), {
+      userId: user.uid,
+      ...teacherData,
+    });
+
+    console.log('✅ Teacher registered successfully!');
+    console.log('📧 Email:', data.email);
+
+    return { user, teacherData };
+  } catch (error: any) {
+    console.error('Teacher registration error:', error);
+    throw new Error(error.message || 'Failed to register teacher');
+  }
+};
+
+export const registerAdmin = async (data: RegisterAdminData) => {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      data.email,
+      data.password
+    );
+
+    const user = userCredential.user;
+
+    await updateProfile(user, {
+      displayName: data.fullName,
+    });
+
+    const adminData = {
+      email: data.email,
+      role: 'admin',
+      profile: {
+        fullName: data.fullName,
+      },
+      settings: {
+        theme: 'light',
+        notifications: {
+          email: true,
+          push: true,
+          sms: false,
+        },
+      },
+      metadata: {
+        createdAt: serverTimestamp(),
+        lastLogin: serverTimestamp(),
+        isActive: true,
+        isEmailVerified: true,
+      },
+    };
+
+    await setDoc(doc(db, 'users', user.uid), adminData);
+
+    console.log('✅ Admin created successfully!');
+    console.log('📧 Email:', data.email);
+    console.log('🔑 Password:', data.password);
+
+    return { user, adminData };
+  } catch (error: any) {
+    console.error('Admin registration error:', error);
+    throw new Error(error.message || 'Failed to register admin');
+  }
+};
 
 export const signIn = async (email: string, password: string) => {
   try {
@@ -136,8 +255,6 @@ export const signIn = async (email: string, password: string) => {
     throw new Error(error.message || 'Failed to sign in');
   }
 };
-
-// ❌ REMOVED: signInWithGoogle function
 
 export const signOut = async () => {
   try {

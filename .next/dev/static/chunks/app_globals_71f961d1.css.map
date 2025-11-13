@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 1, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/waels/OneDrive/Desktop/jes-2025-project/P3-main/P3-main/app/globals.css"],"sourcesContent":["@tailwind base;\r\n@tailwind components;\r\n@tailwind utilities;\r\n\r\n/* Optional: custom styles */\r\nbody {\r\n  @apply bg-gray-50 text-gray-800 font-sans;\r\n}\r\n"],"names":[],"mappings":"AAAA;;AACA;;AACA;;AAIE","debugId":null}}]
-}
