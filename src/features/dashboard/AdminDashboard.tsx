@@ -8,11 +8,7 @@ import {
   TrendingUp,
   AlertCircle,
 } from 'lucide-react';
-import {
-  getAllStudents,
-  getAllTeachers,
-  queryDocuments,
-} from '@/lib/firebase/firestore';
+import { subscribeToCollection } from '@/lib/firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { Spinner } from '@/components/common/Spinner';
@@ -25,27 +21,46 @@ export const AdminDashboard: React.FC = () => {
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [studentsData, teachersData, assignmentsData] = await Promise.all([
-          getAllStudents(),
-          getAllTeachers(),
-          queryDocuments<Assignment>('assignments', [where('isActive', '==', true)]),
-        ]);
+    // ✅ Real-time listener for students
+    const unsubscribeStudents = subscribeToCollection<Student>(
+      'users',
+      (data) => {
+        const studentData = data.filter(u => u.role === 'student');
+        setStudents(studentData);
+        setIsLoading(false);
+      },
+      [where('role', '==', 'student')]
+    );
 
-        setStudents(studentsData);
-        setTeachers(teachersData);
-        setAssignments(assignmentsData);
-      } catch (error) {
-        console.error('Error fetching admin dashboard data:', error);
-      } finally {
+    // ✅ Real-time listener for teachers
+    const unsubscribeTeachers = subscribeToCollection<Teacher>(
+      'users',
+      (data) => {
+        const teacherData = data.filter(u => u.role === 'teacher');
+        setTeachers(teacherData);
+        setIsLoading(false);
+      },
+      [where('role', '==', 'teacher')]
+    );
+
+    // ✅ Real-time listener for assignments
+    const unsubscribeAssignments = subscribeToCollection<Assignment>(
+      'assignments',
+      (data) => {
+        setAssignments(data);
         setIsLoading(false);
       }
-    };
+    );
 
-    fetchData();
+    // Cleanup subscriptions on unmount
+    return () => {
+      unsubscribeStudents();
+      unsubscribeTeachers();
+      unsubscribeAssignments();
+    };
   }, []);
 
   if (isLoading) {
@@ -56,10 +71,23 @@ export const AdminDashboard: React.FC = () => {
     );
   }
 
-  const activeStudents = students.filter((s) => s.subscription.status === 'active');
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Card className="p-6">
+          <p className="text-center text-destructive">{error}</p>
+          <Button onClick={() => window.location.reload()} className="mt-4">
+            Retry
+          </Button>
+        </Card>
+      </div>
+    );
+  }
+
+  const activeStudents = students.filter((s) => s.subscription?.status === 'active');
   const unassignedStudents = students.filter((s) => !s.assignedTeacher);
   const mrr = activeStudents.reduce((acc, s) => {
-    const price = s.subscription.plan === 'basic' ? 29 : s.subscription.plan === 'premium' ? 49 : 99;
+    const price = s.subscription?.plan === 'basic' ? 29 : s.subscription?.plan === 'premium' ? 49 : 99;
     return acc + price;
   }, 0);
 
@@ -139,7 +167,7 @@ export const AdminDashboard: React.FC = () => {
                 <p className="text-2xl font-bold mt-1">{formatCurrency(mrr)}</p>
                 <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
                   <TrendingUp className="h-3 w-3" />
-                  12% from last month
+                  Live Update
                 </p>
               </div>
               <div className="h-12 w-12 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center">
@@ -182,22 +210,28 @@ export const AdminDashboard: React.FC = () => {
             </Link>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {students.slice(0, 5).map((student) => (
-                <div
-                  key={student.uid}
-                  className="flex items-center justify-between p-3 rounded-lg border"
-                >
-                  <div>
-                    <p className="font-medium">{student.profile.fullName}</p>
-                    <p className="text-sm text-muted-foreground">{student.email}</p>
+            {students.length > 0 ? (
+              <div className="space-y-3">
+                {students.slice(0, 5).map((student) => (
+                  <div
+                    key={student.uid}
+                    className="flex items-center justify-between p-3 rounded-lg border"
+                  >
+                    <div>
+                      <p className="font-medium">{student?.profile?.fullName || 'Unknown Student'}</p>
+                      <p className="text-sm text-muted-foreground">{student.email}</p>
+                    </div>
+                    <Link to={`/students/${student.uid}`}>
+                      <Button variant="ghost" size="sm">View</Button>
+                    </Link>
                   </div>
-                  <Link to={`/students/${student.uid}`}>
-                    <Button variant="ghost" size="sm">View</Button>
-                  </Link>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                No students yet
+              </div>
+            )}
           </CardContent>
         </Card>
 

@@ -8,19 +8,35 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { PageSpinner } from '@/components/common/Spinner';
 
-// Pages
+// Public Pages
 import { LandingPage } from '@/pages/LandingPage';
 import { LoginPage } from '@/pages/LoginPage';
 import { RegisterPage } from '@/pages/RegisterPage';
 import { AdminLogin } from '@/pages/admin/AdminLogin';
 import { TeacherLogin } from '@/pages/teacher/TeacherLogin';
 import { TeacherRegister } from '@/pages/teacher/TeacherRegister';
+
+// Dashboards
 import { StudentDashboard } from '@/features/dashboard/StudentDashboard';
 import { TeacherDashboard } from '@/features/dashboard/TeacherDashboard';
 import { AdminDashboard } from '@/features/dashboard/AdminDashboard';
+
+// Features
 import { AssignmentList } from '@/features/assignments/AssignmentList';
 import { AssignmentCreate } from '@/features/assignments/AssignmentCreate';
 import { MessagesList } from '@/features/messages/MessagesList';
+
+// Pages
+import { SettingsPage } from '@/pages/SettingsPage';
+import { TeachersPage } from '@/pages/TeachersPage';
+import { StudentsPage } from '@/pages/StudentsPage';
+import { ProgressPage } from '@/pages/ProgressPage';
+import { AnalyticsPage } from '@/pages/AnalyticsPage';
+import { FinancialsPage } from '@/pages/FinancialsPage';
+import { LibraryPage } from '@/pages/LibraryPage';
+import { NotificationsPage } from '@/pages/NotificationsPage';
+import { ProfilePage } from '@/pages/ProfilePage';
+import { PromoCodesPage } from '@/pages/PromoCodesPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -147,42 +163,51 @@ function AppContent() {
           )
         } 
       />
+          <Route
+      path="/promo-codes"
+      element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <PromoCodesPage />
+        </ProtectedRoute>
+      }
+    />
 
-      {/* Admin Dashboard */}
-      <Route
-        path="/admin/dashboard"
-        element={
-          <ProtectedRoute allowedRoles={['admin']}>
-            <MainLayout>
-              <AdminDashboard />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
-
-      {/* Teacher Dashboard */}
-      <Route
-        path="/teacher/dashboard"
-        element={
-          <ProtectedRoute allowedRoles={['teacher']}>
-            <MainLayout>
-              <TeacherDashboard />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
-
-      {/* Protected Routes - Students & Teachers */}
+      {/* Protected Routes with MainLayout */}
       <Route element={<MainLayout />}>
+        {/* ========== DASHBOARDS ========== */}
+        
+        {/* Admin Dashboard */}
         <Route
-          path="/dashboard"
+          path="/admin/dashboard"
           element={
-            <ProtectedRoute allowedRoles={['student']}>
-              <DashboardRouter />
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminDashboard />
             </ProtectedRoute>
           }
         />
 
+        {/* Teacher Dashboard */}
+        <Route
+          path="/teacher/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['teacher']}>
+              <TeacherDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Student Dashboard */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['student']}>
+              <StudentDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ========== ASSIGNMENTS ========== */}
+        
         <Route
           path="/assignments"
           element={
@@ -201,11 +226,112 @@ function AppContent() {
           }
         />
 
+        {/* ========== STUDENTS ========== */}
+        
+        <Route
+          path="/students"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'teacher']}>
+              <StudentsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ========== TEACHERS ========== */}
+        
+        <Route
+          path="/teachers"
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <TeachersPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ========== MESSAGES ========== */}
+        
         <Route
           path="/messages"
           element={
             <ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}>
               <MessagesList />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ========== PROGRESS ========== */}
+        
+        <Route
+          path="/progress"
+          element={
+            <ProtectedRoute allowedRoles={['student']}>
+              <ProgressPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ========== ANALYTICS ========== */}
+        
+        <Route
+          path="/analytics"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'teacher']}>
+              <AnalyticsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ========== FINANCIALS ========== */}
+        
+        <Route
+          path="/financials"
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <FinancialsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ========== LIBRARY ========== */}
+        
+        <Route
+          path="/library"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'teacher']}>
+              <LibraryPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ========== SETTINGS ========== */}
+        
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'teacher', 'student']}>
+              <SettingsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ========== NOTIFICATIONS ========== */}
+        
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'teacher', 'student']}>
+              <NotificationsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ========== PROFILE ========== */}
+        
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'teacher', 'student']}>
+              <ProfilePage />
             </ProtectedRoute>
           }
         />
@@ -228,25 +354,6 @@ function AppContent() {
       />
     </Routes>
   );
-}
-
-function DashboardRouter() {
-  const { user } = useAuth();
-
-  if (!user) return null;
-
-  switch (user.role) {
-    case 'student':
-      return <StudentDashboard />;
-    case 'teacher':
-      // Teacher should use /teacher/dashboard, redirect if somehow here
-      return <Navigate to="/teacher/dashboard" replace />;
-    case 'admin':
-      // Admin should use /admin/dashboard, redirect if somehow here
-      return <Navigate to="/admin/dashboard" replace />;
-    default:
-      return <Navigate to="/" replace />;
-  }
 }
 
 export default App;

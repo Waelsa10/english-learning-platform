@@ -43,6 +43,13 @@ export const Header: React.FC = () => {
     return null;
   }
 
+  // ✅ Get the correct dashboard route based on role
+  const getDashboardRoute = () => {
+    if (user.role === 'admin') return '/admin/dashboard';
+    if (user.role === 'teacher') return '/teacher/dashboard';
+    return '/dashboard';
+  };
+
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4">
@@ -54,7 +61,8 @@ export const Header: React.FC = () => {
             <Menu className="h-5 w-5" />
           </button>
 
-          <Link to="/" className="flex items-center gap-2">
+          {/* ✅ Updated logo link to go to role-specific dashboard */}
+          <Link to={getDashboardRoute()} className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-lg">E</span>
             </div>

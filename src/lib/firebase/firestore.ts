@@ -18,6 +18,8 @@ import {
   increment,
   arrayUnion,
   arrayRemove,
+  onSnapshot,
+  Unsubscribe,
 } from 'firebase/firestore';
 import { db } from './config';
 import type {
@@ -30,6 +32,68 @@ import type {
   Conversation,
   Notification,
 } from '@/types';
+
+// ✅ Real-time listener functions
+export const subscribeToCollection = <T>(
+  collectionName: string,
+  callback: (data: T[]) => void,
+  constraints: QueryConstraint[] = []
+): Unsubscribe => {
+  try {
+    const collectionRef = collection(db, collectionName);
+    const q = constraints.length > 0 
+      ? query(collectionRef, ...constraints) 
+      : collectionRef;
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const data = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as T[];
+        callback(data);
+      },
+      (error) => {
+        console.error(`Error subscribing to ${collectionName}:`, error);
+      }
+    );
+
+    return unsubscribe;
+  } catch (error) {
+    console.error(`Error setting up subscription for ${collectionName}:`, error);
+    return () => {};
+  }
+};
+
+export const subscribeToDocument = <T>(
+  collectionName: string,
+  docId: string,
+  callback: (data: T | null) => void
+): Unsubscribe => {
+  try {
+    const docRef = doc(db, collectionName, docId);
+    
+    const unsubscribe = onSnapshot(
+      docRef,
+      (docSnapshot) => {
+        if (docSnapshot.exists()) {
+          callback({ id: docSnapshot.id, ...docSnapshot.data() } as T);
+        } else {
+          callback(null);
+        }
+      },
+      (error) => {
+        console.error(`Error subscribing to document ${docId}:`, error);
+      }
+    );
+
+    return unsubscribe;
+  } catch (error) {
+    console.error(`Error setting up document subscription:`, error);
+    return () => {};
+  }
+};
 
 // Generic CRUD operations
 export const createDocument = async <T>(
@@ -126,24 +190,39 @@ export const getTeacherByUid = async (uid: string): Promise<Teacher | null> => {
 };
 
 export const getAllStudents = async (): Promise<Student[]> => {
-  return queryDocuments<Student>('students', [
-    where('metadata.isActive', '==', true),
-    orderBy('metadata.createdAt', 'desc'),
-  ]);
+  try {
+    return queryDocuments<Student>('users', [
+      where('role', '==', 'student'),
+      orderBy('metadata.createdAt', 'desc'),
+    ]);
+  } catch (error) {
+    console.error('Error getting all students:', error);
+    return [];
+  }
 };
 
 export const getAllTeachers = async (): Promise<Teacher[]> => {
-  return queryDocuments<Teacher>('teachers', [
-    where('metadata.isActive', '==', true),
-    orderBy('metadata.createdAt', 'desc'),
-  ]);
+  try {
+    return queryDocuments<Teacher>('users', [
+      where('role', '==', 'teacher'),
+      orderBy('metadata.createdAt', 'desc'),
+    ]);
+  } catch (error) {
+    console.error('Error getting all teachers:', error);
+    return [];
+  }
 };
 
 export const getTeacherStudents = async (teacherId: string): Promise<Student[]> => {
-  return queryDocuments<Student>('students', [
-    where('assignedTeacher', '==', teacherId),
-    where('metadata.isActive', '==', true),
-  ]);
+  try {
+    return queryDocuments<Student>('users', [
+      where('role', '==', 'student'),
+      where('assignedTeacher', '==', teacherId),
+    ]);
+  } catch (error) {
+    console.error('Error getting teacher students:', error);
+    return [];
+  }
 };
 
 export const assignStudentToTeacher = async (
@@ -152,22 +231,14 @@ export const assignStudentToTeacher = async (
 ) => {
   try {
     // Update student
-    await updateDoc(doc(db, 'students', studentId), {
-      assignedTeacher: teacherId,
-      updatedAt: serverTimestamp(),
-    });
-
     await updateDoc(doc(db, 'users', studentId), {
+      assignedTeacher: teacherId,
       'metadata.updatedAt': serverTimestamp(),
     });
 
     // Update teacher's assigned students
-    await updateDoc(doc(db, 'teachers', teacherId), {
-      assignedStudents: arrayUnion(studentId),
-      updatedAt: serverTimestamp(),
-    });
-
     await updateDoc(doc(db, 'users', teacherId), {
+      assignedStudents: arrayUnion(studentId),
       'metadata.updatedAt': serverTimestamp(),
     });
   } catch (error) {
@@ -201,21 +272,31 @@ export const getAssignmentById = async (id: string): Promise<Assignment | null> 
 export const getAssignmentsForStudent = async (
   studentId: string
 ): Promise<Assignment[]> => {
-  return queryDocuments<Assignment>('assignments', [
-    where('assignedTo', 'array-contains', studentId),
-    where('isActive', '==', true),
-    orderBy('dueDate', 'asc'),
-  ]);
+  try {
+    return queryDocuments<Assignment>('assignments', [
+      where('assignedTo', 'array-contains', studentId),
+      where('isActive', '==', true),
+      orderBy('dueDate', 'asc'),
+    ]);
+  } catch (error) {
+    console.error('Error getting assignments for student:', error);
+    return [];
+  }
 };
 
 export const getAssignmentsByTeacher = async (
   teacherId: string
 ): Promise<Assignment[]> => {
-  return queryDocuments<Assignment>('assignments', [
-    where('createdBy', '==', teacherId),
-    where('isActive', '==', true),
-    orderBy('createdAt', 'desc'),
-  ]);
+  try {
+    return queryDocuments<Assignment>('assignments', [
+      where('createdBy', '==', teacherId),
+      where('isActive', '==', true),
+      orderBy('createdAt', 'desc'),
+    ]);
+  } catch (error) {
+    console.error('Error getting assignments by teacher:', error);
+    return [];
+  }
 };
 
 export const updateAssignment = async (
@@ -253,19 +334,29 @@ export const getSubmissionById = async (id: string): Promise<Submission | null> 
 export const getSubmissionsForAssignment = async (
   assignmentId: string
 ): Promise<Submission[]> => {
-  return queryDocuments<Submission>('submissions', [
-    where('assignmentId', '==', assignmentId),
-    orderBy('submittedAt', 'desc'),
-  ]);
+  try {
+    return queryDocuments<Submission>('submissions', [
+      where('assignmentId', '==', assignmentId),
+      orderBy('submittedAt', 'desc'),
+    ]);
+  } catch (error) {
+    console.error('Error getting submissions for assignment:', error);
+    return [];
+  }
 };
 
 export const getStudentSubmissions = async (
   studentId: string
 ): Promise<Submission[]> => {
-  return queryDocuments<Submission>('submissions', [
-    where('studentId', '==', studentId),
-    orderBy('submittedAt', 'desc'),
-  ]);
+  try {
+    return queryDocuments<Submission>('submissions', [
+      where('studentId', '==', studentId),
+      orderBy('submittedAt', 'desc'),
+    ]);
+  } catch (error) {
+    console.error('Error getting student submissions:', error);
+    return [];
+  }
 };
 
 export const updateSubmission = async (
@@ -289,21 +380,17 @@ export const gradeSubmission = async (
     // Update student progress
     const submission = await getSubmissionById(submissionId);
     if (submission && grading) {
-      const student = await getStudentByUid(submission.studentId);
-      if (student) {
-        const newCompletedCount = student.progress.completedAssignments + 1;
+      const student = await getUserByUid(submission.studentId);
+      if (student && student.role === 'student') {
+        const newCompletedCount = (student.progress?.completedAssignments || 0) + 1;
         const newAverageScore =
-          (student.progress.averageScore * student.progress.completedAssignments +
+          ((student.progress?.averageScore || 0) * (student.progress?.completedAssignments || 0) +
             grading.percentage) /
           newCompletedCount;
 
-        await updateDoc(doc(db, 'students', submission.studentId), {
+        await updateDoc(doc(db, 'users', submission.studentId), {
           'progress.completedAssignments': increment(1),
           'progress.averageScore': newAverageScore,
-          updatedAt: serverTimestamp(),
-        });
-
-        await updateDoc(doc(db, 'users', submission.studentId), {
           'metadata.updatedAt': serverTimestamp(),
         });
       }
@@ -373,10 +460,15 @@ export const getOrCreateConversation = async (
 };
 
 export const getUserConversations = async (userId: string): Promise<Conversation[]> => {
-  return queryDocuments<Conversation>('conversations', [
-    where('participants', 'array-contains', userId),
-    orderBy('lastMessageAt', 'desc'),
-  ]);
+  try {
+    return queryDocuments<Conversation>('conversations', [
+      where('participants', 'array-contains', userId),
+      orderBy('lastMessageAt', 'desc'),
+    ]);
+  } catch (error) {
+    console.error('Error getting user conversations:', error);
+    return [];
+  }
 };
 
 export const sendMessage = async (
@@ -406,11 +498,16 @@ export const sendMessage = async (
 export const getConversationMessages = async (
   conversationId: string
 ): Promise<Message[]> => {
-  return queryDocuments<Message>('messages', [
-    where('conversationId', '==', conversationId),
-    where('isDeleted', '==', false),
-    orderBy('timestamp', 'asc'),
-  ]);
+  try {
+    return queryDocuments<Message>('messages', [
+      where('conversationId', '==', conversationId),
+      where('isDeleted', '==', false),
+      orderBy('timestamp', 'asc'),
+    ]);
+  } catch (error) {
+    console.error('Error getting conversation messages:', error);
+    return [];
+  }
 };
 
 export const markMessageAsRead = async (messageId: string, userId: string) => {
@@ -454,11 +551,16 @@ export const getUserNotifications = async (
   userId: string,
   limitCount = 50
 ): Promise<Notification[]> => {
-  return queryDocuments<Notification>('notifications', [
-    where('recipientId', '==', userId),
-    orderBy('createdAt', 'desc'),
-    limit(limitCount),
-  ]);
+  try {
+    return queryDocuments<Notification>('notifications', [
+      where('recipientId', '==', userId),
+      orderBy('createdAt', 'desc'),
+      limit(limitCount),
+    ]);
+  } catch (error) {
+    console.error('Error getting user notifications:', error);
+    return [];
+  }
 };
 
 export const markNotificationAsRead = async (notificationId: string) => {

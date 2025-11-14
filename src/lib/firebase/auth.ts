@@ -29,6 +29,7 @@ interface RegisterAdminData {
   password: string;
   fullName: string;
 }
+
 interface RegisterTeacherData {
   email: string;
   password: string;
@@ -58,11 +59,11 @@ export const registerStudent = async (data: RegisterStudentData) => {
       email: data.email,
       role: 'student',
       profile: {
-        fullName: data.fullName,
-        phoneNumber: data.phoneNumber,
-        timezone: data.timezone,
-        preferredLanguage: data.preferredLanguage,
-        country: data.country,
+        fullName: data.fullName || '',
+        phoneNumber: data.phoneNumber || '', // ✅ Default to empty string
+        timezone: data.timezone || 'UTC', // ✅ Default to UTC
+        preferredLanguage: data.preferredLanguage || 'en', // ✅ Default to en
+        country: data.country || '', // ✅ Default to empty string
       },
       settings: {
         theme: 'light',
@@ -79,8 +80,8 @@ export const registerStudent = async (data: RegisterStudentData) => {
         isEmailVerified: false,
       },
       assignedTeacher: null,
-      englishLevel: data.englishLevel,
-      learningGoals: data.learningGoals,
+      englishLevel: data.englishLevel || 'beginner', // ✅ Default
+      learningGoals: data.learningGoals || [], // ✅ Default to empty array
       subscription: {
         plan: 'basic',
         startDate: serverTimestamp() as any,
@@ -114,10 +115,6 @@ export const registerStudent = async (data: RegisterStudentData) => {
     };
 
     await setDoc(doc(db, 'users', user.uid), studentData);
-    await setDoc(doc(db, 'students', user.uid), {
-      userId: user.uid,
-      ...studentData,
-    });
 
     // Send welcome email (async, don't wait)
     sendWelcomeEmail(data.email, data.fullName).catch(console.error);
@@ -128,6 +125,7 @@ export const registerStudent = async (data: RegisterStudentData) => {
     throw new Error(error.message || 'Failed to register');
   }
 };
+
 export const registerTeacher = async (data: RegisterTeacherData) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(
@@ -146,10 +144,10 @@ export const registerTeacher = async (data: RegisterTeacherData) => {
       email: data.email,
       role: 'teacher',
       profile: {
-        fullName: data.fullName,
-        phoneNumber: data.phoneNumber,
+        fullName: data.fullName || '',
+        phoneNumber: data.phoneNumber || '', // ✅ Default to empty string
         specialization: data.specialization || 'English Teaching',
-        experience: data.experience || '',
+        experience: data.experience || '', // ✅ Default to empty string
       },
       settings: {
         theme: 'light',
@@ -166,14 +164,10 @@ export const registerTeacher = async (data: RegisterTeacherData) => {
         isEmailVerified: false,
       },
       assignedStudents: [],
-      status: 'pending', // Pending admin approval
+      isApproved: false, // ✅ Default to false - needs admin approval
     };
 
     await setDoc(doc(db, 'users', user.uid), teacherData);
-    await setDoc(doc(db, 'teachers', user.uid), {
-      userId: user.uid,
-      ...teacherData,
-    });
 
     console.log('✅ Teacher registered successfully!');
     console.log('📧 Email:', data.email);
@@ -203,7 +197,7 @@ export const registerAdmin = async (data: RegisterAdminData) => {
       email: data.email,
       role: 'admin',
       profile: {
-        fullName: data.fullName,
+        fullName: data.fullName || '',
       },
       settings: {
         theme: 'light',
@@ -239,6 +233,7 @@ export const signIn = async (email: string, password: string) => {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
+    // ✅ Update last login
     await setDoc(
       doc(db, 'users', user.uid),
       {

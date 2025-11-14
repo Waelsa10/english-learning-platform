@@ -11,24 +11,30 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/common/Ca
 import { Button } from '@/components/common/Button';
 import { Avatar } from '@/components/common/Avatar';
 import { Badge } from '@/components/common/Badge';
-import { Spinner } from '@/components/common/Spinner';
+import { Spinner, PageSpinner } from '@/components/common/Spinner';
 import { formatPercentage } from '@/utils/formatters';
 import type { Student, Assignment, Submission, Teacher } from '@/types';
 
 export const TeacherDashboard: React.FC = () => {
   const { user } = useAuthStore();
-  const teacher = user as Teacher;
   const [students, setStudents] = useState<Student[]>([]);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [pendingSubmissions, setPendingSubmissions] = useState<Submission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // ✅ Add user validation
   useEffect(() => {
+    if (!user || !user.uid) {
+      setIsLoading(false);
+      return;
+    }
+
     const fetchData = async () => {
       try {
+        setIsLoading(true);
         const [studentsData, assignmentsData] = await Promise.all([
-          getTeacherStudents(teacher.uid),
-          getAssignmentsByTeacher(teacher.uid),
+          getTeacherStudents(user.uid),
+          getAssignmentsByTeacher(user.uid),
         ]);
 
         setStudents(studentsData);
@@ -51,18 +57,32 @@ export const TeacherDashboard: React.FC = () => {
     };
 
     fetchData();
-  }, [teacher.uid]);
+  }, [user?.uid]); // ✅ Use optional chaining
 
+  // ✅ Loading state
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <Spinner size="lg" />
+        <PageSpinner />
+      </div>
+    );
+  }
+
+  // ✅ No user state
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Card className="p-6">
+          <p className="text-center text-muted-foreground">
+            Unable to load dashboard. Please sign in again.
+          </p>
+        </Card>
       </div>
     );
   }
 
   const averageStudentProgress =
-    students.reduce((acc, s) => acc + s.progress.overallProgress, 0) /
+    students.reduce((acc, s) => acc + (s.progress?.overallProgress || 0), 0) /
     (students.length || 1);
 
   return (
@@ -71,7 +91,7 @@ export const TeacherDashboard: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">
-            Welcome back, {teacher.profile.fullName}!
+            Welcome back, {user?.profile?.fullName || 'Teacher'}!
           </h1>
           <p className="text-muted-foreground mt-1">
             Manage your students and assignments
@@ -210,23 +230,27 @@ const StudentCard: React.FC<{ student: Student }> = ({ student }) => {
       <div className="p-4 rounded-lg border hover:bg-accent transition-colors">
         <div className="flex items-center gap-3">
           <Avatar
-            src={student.profile.profilePicture}
-            fallback={student.profile.fullName.charAt(0)}
+            src={student?.profile?.profilePicture}
+            fallback={student?.profile?.fullName?.charAt(0) || 'S'}
             size="md"
           />
           <div className="flex-1">
-            <h4 className="font-semibold">{student.profile.fullName}</h4>
+            <h4 className="font-semibold">{student?.profile?.fullName || 'Unknown Student'}</h4>
             <p className="text-sm text-muted-foreground">
-              {student.progress.completedAssignments} / {student.progress.totalAssignments}{' '}
+              {student?.progress?.completedAssignments || 0} / {student?.progress?.totalAssignments || 0}{' '}
               assignments
             </p>
           </div>
           <div className="text-right">
             <p className="text-sm font-medium">
-              {formatPercentage(student.progress.overallProgress)}
+              {formatPercentage(student?.progress?.overallProgress || 0)}
             </p>
-            <Badge variant={student.englishLevel === 'advanced' ? 'success' : student.englishLevel === 'intermediate' ? 'warning' : 'info'}>
-              {student.englishLevel}
+            <Badge variant={
+              student?.englishLevel === 'advanced' ? 'success' : 
+              student?.englishLevel === 'intermediate' ? 'warning' : 
+              'info'
+            }>
+              {student?.englishLevel || 'beginner'}
             </Badge>
           </div>
         </div>
@@ -241,9 +265,12 @@ const SubmissionCard: React.FC<{ submission: Submission }> = ({ submission }) =>
       <div className="p-4 rounded-lg border hover:bg-accent transition-colors">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="font-semibold">{submission.studentName}</h4>
+            <h4 className="font-semibold">{submission?.studentName || 'Unknown Student'}</h4>
             <p className="text-sm text-muted-foreground">
-              Submitted {formatRelativeTime(submission.submittedAt.toDate())}
+              Submitted {submission?.submittedAt?.toDate 
+                ? formatRelativeTime(submission.submittedAt.toDate())
+                : 'recently'
+              }
             </p>
           </div>
           <Badge variant="warning">Review</Badge>

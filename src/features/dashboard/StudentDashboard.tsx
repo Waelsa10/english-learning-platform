@@ -7,24 +7,30 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/common/Ca
 import { Button } from '@/components/common/Button';
 import { Badge } from '@/components/common/Badge';
 import { Avatar } from '@/components/common/Avatar';
-import { Spinner } from '@/components/common/Spinner';
+import { Spinner, PageSpinner } from '@/components/common/Spinner';
 import { formatRelativeTime, formatPercentage } from '@/utils/formatters';
 import type { Assignment, Student, Teacher } from '@/types';
-
+import { AvailablePromoCodes } from '@/components/subscription/AvailablePromoCodes';
 export const StudentDashboard: React.FC = () => {
   const { user } = useAuthStore();
-  const student = user as Student;
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [teacher, setTeacher] = useState<Teacher | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // ✅ Add user validation
   useEffect(() => {
+    if (!user || !user.uid) {
+      setIsLoading(false);
+      return;
+    }
+
     const fetchData = async () => {
       try {
+        setIsLoading(true);
         const [assignmentsData, teacherData] = await Promise.all([
-          getAssignmentsForStudent(student.uid),
-          student.assignedTeacher
-            ? getTeacherByUid(student.assignedTeacher)
+          getAssignmentsForStudent(user.uid),
+          user.assignedTeacher
+            ? getTeacherByUid(user.assignedTeacher)
             : Promise.resolve(null),
         ]);
 
@@ -38,28 +44,60 @@ export const StudentDashboard: React.FC = () => {
     };
 
     fetchData();
-  }, [student.uid, student.assignedTeacher]);
+  }, [user?.uid, user?.assignedTeacher]); // ✅ Use optional chaining
 
+  // ✅ Loading state
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <Spinner size="lg" />
+        <PageSpinner />
+      </div>
+    );
+  }
+
+  // ✅ No user state
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Card className="p-6">
+          <p className="text-center text-muted-foreground">
+            Unable to load dashboard. Please sign in again.
+          </p>
+        </Card>
       </div>
     );
   }
 
   const pendingAssignments = assignments.filter(
-    (a) => !a.assignedTo.includes(student.uid)
+    (a) => !a.assignedTo?.includes(user.uid)
   );
   const upcomingAssignments = assignments
-    .filter((a) => new Date(a.dueDate.toDate()) > new Date())
+    .filter((a) => a.dueDate?.toDate && new Date(a.dueDate.toDate()) > new Date())
     .slice(0, 5);
+
+  // ✅ Use optional chaining for progress
+  const progress = user.progress || {
+    overallProgress: 0,
+    completedAssignments: 0,
+    totalAssignments: 0,
+    averageScore: 0,
+    streak: 0,
+    skillsBreakdown: {
+      reading: 0,
+      writing: 0,
+      listening: 0,
+      speaking: 0,
+      grammar: 0,
+    },
+  };
 
   return (
     <div className="space-y-6">
       {/* Welcome Section */}
       <div>
-        <h1 className="text-3xl font-bold">Welcome back, {student.profile.fullName}!</h1>
+        <h1 className="text-3xl font-bold">
+          Welcome back, {user?.profile?.fullName || 'Student'}!
+        </h1>
         <p className="text-muted-foreground mt-1">
           Here's your learning progress overview
         </p>
@@ -75,7 +113,7 @@ export const StudentDashboard: React.FC = () => {
                   Overall Progress
                 </p>
                 <p className="text-2xl font-bold mt-1">
-                  {formatPercentage(student.progress.overallProgress)}
+                  {formatPercentage(progress.overallProgress)}
                 </p>
               </div>
               <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
@@ -93,7 +131,7 @@ export const StudentDashboard: React.FC = () => {
                   Completed
                 </p>
                 <p className="text-2xl font-bold mt-1">
-                  {student.progress.completedAssignments}/{student.progress.totalAssignments}
+                  {progress.completedAssignments}/{progress.totalAssignments}
                 </p>
               </div>
               <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
@@ -111,7 +149,7 @@ export const StudentDashboard: React.FC = () => {
                   Average Score
                 </p>
                 <p className="text-2xl font-bold mt-1">
-                  {formatPercentage(student.progress.averageScore)}
+                  {formatPercentage(progress.averageScore)}
                 </p>
               </div>
               <div className="h-12 w-12 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center">
@@ -129,7 +167,7 @@ export const StudentDashboard: React.FC = () => {
                   Study Streak
                 </p>
                 <p className="text-2xl font-bold mt-1">
-                  {student.progress.streak} days
+                  {progress.streak} days
                 </p>
               </div>
               <div className="h-12 w-12 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
@@ -152,21 +190,21 @@ export const StudentDashboard: React.FC = () => {
               <CardContent>
                 <div className="flex items-center gap-4">
                   <Avatar
-                    src={teacher.profile.profilePicture}
-                    fallback={teacher.profile.fullName.charAt(0)}
+                    src={teacher?.profile?.profilePicture}
+                    fallback={teacher?.profile?.fullName?.charAt(0) || 'T'}
                     size="lg"
                   />
                   <div className="flex-1">
-                    <h3 className="font-semibold text-lg">{teacher.profile.fullName}</h3>
+                    <h3 className="font-semibold text-lg">{teacher?.profile?.fullName || 'Unknown Teacher'}</h3>
                     <p className="text-sm text-muted-foreground">
-                      {teacher.qualifications.experience} years of experience
+                      {teacher?.qualifications?.experience || 0} years of experience
                     </p>
                     <div className="flex flex-wrap gap-2 mt-2">
-                      {teacher.qualifications.specializations.slice(0, 3).map((spec) => (
+                      {teacher?.qualifications?.specializations?.slice(0, 3).map((spec) => (
                         <Badge key={spec} variant="info">
                           {spec}
                         </Badge>
-                      ))}
+                      )) || <span className="text-sm text-muted-foreground">No specializations listed</span>}
                     </div>
                   </div>
                   <Link to={`/messages?teacher=${teacher.uid}`}>
@@ -228,18 +266,18 @@ export const StudentDashboard: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {Object.entries(student.progress.skillsBreakdown).map(([skill, progress]) => (
+                {Object.entries(progress.skillsBreakdown).map(([skill, skillProgress]) => (
                   <div key={skill}>
                     <div className="flex justify-between text-sm mb-1">
                       <span className="font-medium capitalize">{skill}</span>
                       <span className="text-muted-foreground">
-                        {formatPercentage(progress)}
+                        {formatPercentage(skillProgress)}
                       </span>
                     </div>
                     <div className="h-2 bg-muted rounded-full overflow-hidden">
                       <div
                         className="h-full bg-primary rounded-full transition-all"
-                        style={{ width: `${progress}%` }}
+                        style={{ width: `${skillProgress}%` }}
                       />
                     </div>
                   </div>
@@ -247,17 +285,27 @@ export const StudentDashboard: React.FC = () => {
               </div>
             </CardContent>
           </Card>
+          // Add this to the StudentDashboard component, in the sidebar section
 
+          {/* Available Promo Codes */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Available Promo Codes</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <AvailablePromoCodes />
+            </CardContent>
+          </Card>        
           {/* Quick Actions */}
           <Card>
             <CardHeader>
               <CardTitle>Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <Link to="/assignments/new" className="block">
+              <Link to="/assignments" className="block">
                 <Button variant="outline" className="w-full justify-start">
                   <BookOpen className="h-4 w-4 mr-2" />
-                  Start New Assignment
+                  View Assignments
                 </Button>
               </Link>
               <Link to="/progress" className="block">
@@ -283,6 +331,10 @@ export const StudentDashboard: React.FC = () => {
 };
 
 const AssignmentCard: React.FC<{ assignment: Assignment }> = ({ assignment }) => {
+  if (!assignment.dueDate?.toDate) {
+    return null;
+  }
+
   const dueDate = assignment.dueDate.toDate();
   const now = new Date();
   const daysUntilDue = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
@@ -292,15 +344,19 @@ const AssignmentCard: React.FC<{ assignment: Assignment }> = ({ assignment }) =>
       <div className="p-4 rounded-lg border hover:bg-accent transition-colors">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <h4 className="font-semibold">{assignment.title}</h4>
+            <h4 className="font-semibold">{assignment.title || 'Untitled Assignment'}</h4>
             <p className="text-sm text-muted-foreground mt-1">
-              {assignment.description}
+              {assignment.description || 'No description'}
             </p>
             <div className="flex items-center gap-2 mt-2">
-              <Badge variant={assignment.difficulty === 'easy' ? 'success' : assignment.difficulty === 'medium' ? 'warning' : 'danger'}>
-                {assignment.difficulty}
+              <Badge variant={
+                assignment.difficulty === 'easy' ? 'success' : 
+                assignment.difficulty === 'medium' ? 'warning' : 
+                'danger'
+              }>
+                {assignment.difficulty || 'medium'}
               </Badge>
-              <Badge variant="info">{assignment.type}</Badge>
+              <Badge variant="info">{assignment.type || 'general'}</Badge>
             </div>
           </div>
           <div className="text-right">

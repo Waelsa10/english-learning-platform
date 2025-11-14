@@ -10,6 +10,7 @@ import {
   FileText,
   DollarSign,
   UserCog,
+  Tag, // ✅ Added missing import
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useUIStore } from '@/store/uiStore';
@@ -19,7 +20,7 @@ import type { UserRole } from '@/types';
 interface NavItem {
   label: string;
   icon: React.ReactNode;
-  href: string;
+  href: string | ((role: UserRole) => string);
   roles: UserRole[];
 }
 
@@ -27,8 +28,18 @@ const navItems: NavItem[] = [
   {
     label: 'Dashboard',
     icon: <LayoutDashboard className="h-5 w-5" />,
-    href: '/dashboard',
+    href: (role: UserRole) => {
+      if (role === 'admin') return '/admin/dashboard';
+      if (role === 'teacher') return '/teacher/dashboard';
+      return '/dashboard';
+    },
     roles: ['admin', 'teacher', 'student'],
+  },
+  {
+    label: 'Promo Codes',
+    icon: <Tag className="h-5 w-5" />,
+    href: '/promo-codes',
+    roles: ['admin'],
   },
   {
     label: 'Assignments',
@@ -90,9 +101,20 @@ export const Sidebar: React.FC = () => {
   const { user } = useAuthStore();
   const { sidebarOpen, setSidebarOpen } = useUIStore();
 
+  if (!user || !user.role) {
+    return null;
+  }
+
   const filteredNavItems = navItems.filter((item) =>
-    user?.role ? item.roles.includes(user.role) : false
+    item.roles.includes(user.role)
   );
+
+  const getHref = (item: NavItem): string => {
+    if (typeof item.href === 'function') {
+      return item.href(user.role);
+    }
+    return item.href;
+  };
 
   return (
     <>
@@ -112,24 +134,28 @@ export const Sidebar: React.FC = () => {
         )}
       >
         <nav className="flex flex-col gap-1 p-4">
-          {filteredNavItems.map((item) => (
-            <NavLink
-              key={item.href}
-              to={item.href}
-              onClick={() => setSidebarOpen(false)}
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-3 px-3 py-2 rounded-lg transition-colors',
-                  isActive
-                    ? 'bg-primary text-primary-foreground'
-                    : 'hover:bg-accent'
-                )
-              }
-            >
-              {item.icon}
-              <span className="font-medium">{item.label}</span>
-            </NavLink>
-          ))}
+          {filteredNavItems.map((item) => {
+            const href = getHref(item);
+            
+            return (
+              <NavLink
+                key={href}
+                to={href}
+                onClick={() => setSidebarOpen(false)}
+                className={({ isActive }) =>
+                  cn(
+                    'flex items-center gap-3 px-3 py-2 rounded-lg transition-colors',
+                    isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'hover:bg-accent'
+                  )
+                }
+              >
+                {item.icon}
+                <span className="font-medium">{item.label}</span>
+              </NavLink>
+            );
+          })}
         </nav>
       </aside>
 

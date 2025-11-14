@@ -21,11 +21,17 @@ export const MessagesList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
+  // ✅ Add early return if no user
   useEffect(() => {
     const fetchConversations = async () => {
-      if (!user) return;
+      // ✅ Guard clause - exit if no user
+      if (!user || !user.uid) {
+        setIsLoading(false);
+        return;
+      }
 
       try {
+        setIsLoading(true);
         const data = await getUserConversations(user.uid);
         setConversations(data);
 
@@ -42,20 +48,47 @@ export const MessagesList: React.FC = () => {
     };
 
     fetchConversations();
-  }, [user, searchParams]);
+  }, [user?.uid, searchParams]); // ✅ Use optional chaining in dependency
 
+  // ✅ Filter only if user exists
   const filteredConversations = conversations.filter((conv) => {
-    const otherParticipant = conv.participants.find((p) => p !== user?.uid);
+    if (!user?.uid) return false; // ✅ Safety check
+    
+    const otherParticipant = conv.participants.find((p) => p !== user.uid);
     if (!otherParticipant) return false;
 
-    const participantName = conv.participantDetails[otherParticipant]?.name || '';
+    const participantName = conv.participantDetails?.[otherParticipant]?.name || '';
     return participantName.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
+  // ✅ Loading state
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  // ✅ No user state
+  if (!user || !user.uid) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Card className="p-6">
+          <div className="text-center">
+            <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Unable to load messages</h3>
+            <p className="text-muted-foreground mb-4">
+              Please sign in to view your conversations.
+            </p>
+            <button
+              onClick={() => navigate('/login')}
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+            >
+              Sign In
+            </button>
+          </div>
+        </Card>
       </div>
     );
   }
@@ -83,7 +116,7 @@ export const MessagesList: React.FC = () => {
                     <ConversationItem
                       key={conversation.id}
                       conversation={conversation}
-                      userId={user!.uid}
+                      userId={user.uid}
                       isSelected={selectedConversation === conversation.id}
                       onClick={() => setSelectedConversation(conversation.id)}
                     />
@@ -92,7 +125,14 @@ export const MessagesList: React.FC = () => {
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-center p-6">
                   <MessageSquare className="h-12 w-12 text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">No conversations yet</p>
+                  <p className="text-muted-foreground">
+                    {searchTerm ? 'No conversations found' : 'No conversations yet'}
+                  </p>
+                  {!searchTerm && (
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Start a conversation with your teacher or students
+                    </p>
+                  )}
                 </div>
               )}
             </div>
@@ -128,12 +168,12 @@ const ConversationItem: React.FC<{
 }> = ({ conversation, userId, isSelected, onClick }) => {
   const otherParticipantId = conversation.participants.find((p) => p !== userId);
   const otherParticipant = otherParticipantId
-    ? conversation.participantDetails[otherParticipantId]
+    ? conversation.participantDetails?.[otherParticipantId] // ✅ Added optional chaining
     : null;
 
   if (!otherParticipant) return null;
 
-  const unreadCount = conversation.unreadCount[userId] || 0;
+  const unreadCount = conversation.unreadCount?.[userId] || 0; // ✅ Added optional chaining
 
   return (
     <button
@@ -146,13 +186,13 @@ const ConversationItem: React.FC<{
         <div className="relative">
           <Avatar
             src={otherParticipant.profilePicture}
-            fallback={otherParticipant.name.charAt(0)}
+            fallback={otherParticipant.name?.charAt(0) || '?'} // ✅ Added optional chaining and fallback
             size="md"
           />
           {unreadCount > 0 && (
             <div className="absolute -top-1 -right-1 h-5 w-5 bg-primary rounded-full flex items-center justify-center">
               <span className="text-xs text-primary-foreground font-bold">
-                {unreadCount}
+                {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             </div>
           )}
@@ -160,10 +200,16 @@ const ConversationItem: React.FC<{
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-1">
-            <p className="font-semibold truncate">{otherParticipant.name}</p>
-            <span className="text-xs text-muted-foreground">
-              {formatRelativeTime(conversation.lastMessageAt.toDate())}
-            </span>
+            <p className="font-semibold truncate">{otherParticipant.name || 'Unknown User'}</p>
+            {conversation.lastMessageAt && (
+              <span className="text-xs text-muted-foreground">
+                {formatRelativeTime(
+                  conversation.lastMessageAt.toDate 
+                    ? conversation.lastMessageAt.toDate() 
+                    : new Date(conversation.lastMessageAt)
+                )}
+              </span>
+            )}
           </div>
           <p className="text-sm text-muted-foreground truncate">
             {conversation.lastMessage || 'No messages yet'}

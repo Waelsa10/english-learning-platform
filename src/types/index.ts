@@ -370,3 +370,32 @@ export interface PromoCodeUsage {
   appliedAt: Timestamp;
   subscriptionId?: string;
 }
+export interface PromoCode {
+  id: string;
+  code: string;
+  description?: string;
+  discountPercentage: number;
+  discountType: 'percentage' | 'fixed';
+  discountAmount?: number;
+  isActive: boolean;
+  validFrom: any; // Firestore Timestamp
+  validUntil: any; // Firestore Timestamp
+  usageLimit: number | null;
+  usageCount: number;
+  applicablePlans: ('basic' | 'premium' | 'enterprise')[];
+  createdBy: string;
+  createdAt: any;
+  updatedAt: any;
+}
+
+export interface PromoCodeUsage {
+  id: string;
+  promoCodeId: string;
+  promoCode: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  discountPercentage: number;
+  appliedAt: any;
+  plan: string;
+}
